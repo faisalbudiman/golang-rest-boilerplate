@@ -1,0 +1,56 @@
+version: "3.5"
+services:
+  # api
+  golang-rest-boilerplate:
+    container_name: golang-rest-boilerplate
+    image: golang-rest-boilerplate:latest
+    ports:
+      - "3030:3030"
+    depends_on: 
+      - golang-rest-boilerplate-postgres
+      - golang-rest-boilerplate-redis
+    networks:
+      - golang-rest-boilerplate-net
+    
+  # postgres
+  golang-rest-boilerplate-postgres:
+    container_name: golang-rest-boilerplate-postgres
+    image: postgres:12-alpine 
+    environment: 
+      - POSTGRES_USER=golang-rest-boilerplate_user
+      - POSTGRES_PASSWORD=supergolang-rest-boilerplate
+      - POSTGRES_DB=golang_rest_boilerplate_db
+    volumes: 
+      - golang-rest-boilerplate-postgres:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+    networks:
+      - golang-rest-boilerplate-net
+  
+  # redis
+  golang-rest-boilerplate-redis:
+    image: "redis:alpine"
+    container_name: golang-rest-boilerplate-redis
+    command: redis-server --requirepass 21541e54-d91c-4c4b-ab94-26fa5a46a654
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    volumes:
+      - golang-rest-boilerplate-redis:/var/lib/redis
+      - golang-rest-boilerplate-redis-conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    restart: always
+    networks:
+      - golang-rest-boilerplate-net
+  
+volumes:
+  golang-rest-boilerplate-postgres:
+    external: false
+  golang-rest-boilerplate-redis:
+    external: false
+  golang-rest-boilerplate-redis-conf:
+    external: false
+  
+networks:
+  golang-rest-boilerplate-net:
+    name: golang-rest-boilerplate-net
